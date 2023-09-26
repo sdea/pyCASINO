@@ -21,13 +21,22 @@ def compute_sigma(E, Z, alpha):
     sigma = numeric_factor * alpha_factor * energy_factor
     return sigma
 
- # The mean free path 
- def compute_lambda(A, rho, sigma):
-
-    lambda_mean = A / (constants.N_a * rho * sigma)
-    return lambda_mean
-
 # The random path lenght takend by the electron 
 def compute_step(lambda_mean):
 
-    random_step = -lambda_mean * np.log(np.random.uniform(0, 1))  
+    random_step = -lambda_mean * np.log(np.random.uniform(0, 1))
+    return random_step  
+
+# Compute the cosine of the solid angle (radomic)
+def compute_scatt_angle(alpha):
+
+    rnd_number = np.random.uniform(1, 0)
+    cos_theta = 1 - ((2 * alpha * rnd_number))/(1 + alpha - rnd_number)
+    return cos_theta
+
+def compute_lambda(A, rho, sigma):
+    lambda_mean = A / (constants.N_a * rho * sigma)
+    return lambda_mean 
+
+
+
