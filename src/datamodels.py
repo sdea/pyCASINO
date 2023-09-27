@@ -3,6 +3,7 @@ import numpy as np
 
 class Pos:
     def __init__(self, rx, ry) -> None:
+        # Direction cosine
         self.rx = rx
         self.ry = ry
 
