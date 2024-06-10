@@ -9,14 +9,14 @@ from pycasino import constants
 
 def compute_alpha(E, Z):
     """
-    Compute the screening factor, taking into account the electron cloud surrounding each atom.
+    This function computes the screening factor, which accounts for the sorrounding electron cloud of the nucleus. The expression used is empirically estimated (Bishop 1976).
     
     Parameters
     ----------
     E : float
         The energy of the electron.
     Z : int
-        The atomic number of the element.
+        The atomic number of the target.
     
     Returns
     -------
@@ -28,21 +28,21 @@ def compute_alpha(E, Z):
 
 def compute_sigma(E, Z, alpha):
     """
-    Compute the Rutherford scattering cross-section.
+    This functions computes the relativistic corrected, screened Rutherford elastic cross-section. E is the energy of the electron in keV, Z is the atomic number of the target and alpha is a screening factor. The screening factor accounts for the fact that the incident electron does not see all the charge of the nucleus because of the sorrounding electron cloud.
     
     Parameters
     ----------
     E : float
         The energy of the electron.
     Z : int
-        The atomic number of the element.
+        The atomic number of the target.
     alpha : float
         The screening factor.
     
     Returns
     -------
     float
-        The Rutherford scattering cross-section in cm^2.
+        The Rutherford elastic scattering cross-section in cm^2.
     """
     numeric_factor = 5.21E-21 * (Z**2)/(E**2)
     alpha_factor = (4 * np.pi) / (alpha * (1 + alpha))
@@ -53,7 +53,7 @@ def compute_sigma(E, Z, alpha):
 
 def compute_step(lambda_mean):
     """
-    Compute the random path length taken by the electron.
+    This function computes the random path length traveled by the electron between two scattering events.
     
     Parameters
     ----------
@@ -63,14 +63,14 @@ def compute_step(lambda_mean):
     Returns
     -------
     float
-        The random path length.
+        The random path length expressed in cm.
     """
     random_step = -lambda_mean * np.log(np.random.uniform(0, 1))
     return random_step
 
 def compute_scatt_angle(alpha):
     """
-    Compute the cosine of the solid angle.
+    This function computes the scattering angle related to a scattering event.
     
     Parameters
     ----------
@@ -89,28 +89,76 @@ def compute_scatt_angle(alpha):
 
 def compute_lambda(A, rho, sigma):
     """
-    Compute the mean free path length.
+    This function computes the mean free path of the electron in the target material, given the Rutherford cross-section sigma.
     
     Parameters
     ----------
     A : float
-        The atomic mass number.
+        The atomic mass number of the target (g/mol).
     rho : float
-        The density of the material.
+        The density of the target (g/cm^3).
     sigma : float
-        The scattering cross-section.
+        The scattering cross-section (cm^2).
     
     Returns
     -------
     float
         The mean free path length in cm.
     """
-    lambda_path = A / (rho * constants.N_a * sigma * 1E-21)
+    # lambda_path = A / (rho * constants.N_a * sigma * 1E-21)
+    lambda_path = A / (rho * constants.N_a * sigma)
     return lambda_path
+
+def compute_J(Z):
+    """
+    This function computes the mean ionization potential for a given element with atomic number Z.
+    
+    Parameters
+    ----------
+
+    Z : int 
+        Atomic number of the target material.
+    
+    Returns
+    -------
+    float
+        The mean ionization potential in keV.
+    """
+
+    J = (9.76 * Z + 58.5 / Z**0.19) * 1E-03
+    return J
+
+def compute_energy_loss(E, Z, A, rho, step):
+    """
+    This function computes the energy loss experienced by the electron as it moves through the target.
+    
+    Parameters
+    ----------
+    E : float 
+        Energy of the electron in keV.
+    Z : int
+        Atomic number of the target material.
+    A : float 
+        Atomic mass of the target in g/mol.
+    rho : float 
+        Density of the target in g/cm^3.
+    step : float 
+        The random step length between scattering events in cm.
+    
+    Returns
+    ------- 
+    float
+        Energy loss of the particle over the given step size in MeV.
+    """
+
+    J = compute_J(Z)
+    dEdS = -78500 * ((rho * Z) / (A * E)) * np.log((1.166 * E) / J + 1)
+    E_loss = step * dEdS
+    return E_loss
 
 def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
     """
-    Simulate the trajectory of an electron through a material.
+    This function computes the trajectory of a single electron inside a uniform, bulk material. 
     
     Parameters
     ----------
@@ -133,9 +181,9 @@ def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
     -------
     tuple
         A tuple containing:
-        - x_list (list of float): List of x-coordinates of the electron trajectory.
-        - y_list (list of float): List of y-coordinates of the electron trajectory.
-        - is_backscattered (bool): True if the electron is backscattered, False otherwise.
+            - x_list (list of float): List of x-coordinates of the single electron trajectory.
+            - y_list (list of float): List of y-coordinates of the single electron trajectory.
+            - is_backscattered (bool): True if the electron is backscattered, False otherwise.
     """
     x_list = []
     y_list = []
@@ -166,15 +214,20 @@ def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
         else:
             is_backscattered = False
         
+        E_loss = compute_energy_loss(E, Z, A, rho, step)
+        E = E + E_loss
+        
         if E < 0.2:
             break
         else:
             x_list.append(x)
             y_list.append(y)
+
+        
     
     return x_list, y_list, is_backscattered
 
-def simulate_bulk_interaction(E, Z, A, rho, radius, center, num_electrons = 5000):
+def simulate_bulk_interaction(E_beam, Z, A, rho, radius, center, num_electrons = 5000):
 
     """
     Simulate the trajectory of an electron through a material.
@@ -207,6 +260,7 @@ def simulate_bulk_interaction(E, Z, A, rho, radius, center, num_electrons = 5000
     
         # Reset parameters  
         x = 0
+        E = E_beam
 
         # For the radius we need a gauss distribution
         y = center
@@ -216,7 +270,6 @@ def simulate_bulk_interaction(E, Z, A, rho, radius, center, num_electrons = 5000
         
         x_list, y_list, is_backscattered = compute_single_trajectory(E, Z, A, rho, x, y) 
             
-        # The main loop
         bse_list.append(is_backscattered)
         x_list_final.append(x_list)
         y_list_final.append(y_list)

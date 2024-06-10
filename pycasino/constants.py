@@ -3,7 +3,7 @@ A set of useful constants
 """
 
 # Avogadro number 
-N_a = 6.02214076e23
+N_a = 6.02214076 * 1E023
 
 elements = [
     {"symbol": "H", "atomic_number": 1, "density": 0.00008988, "atomic_mass": 1.008},
