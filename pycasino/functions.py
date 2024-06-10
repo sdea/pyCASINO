@@ -1,9 +1,11 @@
 """
 A set of functions needed to compute the electron trajectories
 """
+import sys
+sys.path.append('/Users/sdea/Coding/pyCASINO')
 
 import numpy as np
-import constants
+from pycasino import constants
 
 def compute_alpha(E, Z):
     """
@@ -103,10 +105,10 @@ def compute_lambda(A, rho, sigma):
     float
         The mean free path length in cm.
     """
-    lambda_path = A / (rho * constants.N_A * sigma * 1E-21)
+    lambda_path = A / (rho * constants.N_a * sigma * 1E-21)
     return lambda_path
 
-def simulate_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
+def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
     """
     Simulate the trajectory of an electron through a material.
     
@@ -172,27 +174,51 @@ def simulate_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
     
     return x_list, y_list, is_backscattered
 
-def get_element_properties(symbol):
-    """
-    Get the properties of an element by its symbol.
+def simulate_bulk_interaction(E, Z, A, rho, radius, center, num_electrons = 5000):
 
+    """
+    Simulate the trajectory of an electron through a material.
+    
     Parameters
     ----------
-    symbol : str
-        The symbol of the element.
-
+    E : float
+        The initial energy of the electron.
+    Z : int
+        The atomic number of the element.
+    A : float
+        The atomic mass number.
+    rho : float
+        The density of the material.
+    radius : float
+        The radius of the electron beam
+    center : float
+        The y-coordinate for the center of the electron beam
+    num_electrons : int, optional
+        The number of electrons to simulate (default is 5000).
+    
     Returns
     -------
-    dict
-        A dictionary containing the atomic number, atomic mass, and density of the element.
+    
     """
-    for element in constants.elements:
-        if element["symbol"] == symbol:
-            return {
-                "atomic_number": element["atomic_number"],
-                "atomic_mass": element["atomic_mass"],
-                "density": element["density"],
-            }
-        else:
-            print(f'Element {symbol} not found! Returning None...')
-            return None
+    x_list_final = [] 
+    y_list_final = []
+    bse_list = []
+    for n_el in range(0, num_electrons):
+    
+        # Reset parameters  
+        x = 0
+
+        # For the radius we need a gauss distribution
+        y = center
+        x_list = []
+        y_list = []
+        is_backscattered = False
+        
+        x_list, y_list, is_backscattered = compute_single_trajectory(E, Z, A, rho, x, y) 
+            
+        # The main loop
+        bse_list.append(is_backscattered)
+        x_list_final.append(x_list)
+        y_list_final.append(y_list)
+    
+    return bse_list, x_list_final, y_list_final
