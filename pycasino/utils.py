@@ -9,7 +9,7 @@ from pycasino import constants
 
 def get_element_properties(symbol):
     """
-    Get the properties of an element by its symbol.
+    This function returns the properties of an element by its symbol.
 
     Parameters
     ----------
@@ -33,6 +33,22 @@ def get_element_properties(symbol):
             return None
         
 def plot_simulation_results(x_traj_list, y_traj_list, is_bse_list, plot_interval=10, figsize=(10,10)):
+    
+    """
+    A convenience function to plot the results of a simulation
+
+    Parameters
+    ----------
+    x_traj_list : list
+        The list of x-coordinates for the electrons trajectory
+     y_traj_list : list
+        The list of y-coordinates for the electrons trajectory
+    is_bse_list : list 
+        The list of Bools indicating the the simulated electron is BSE
+    plot_interval : int, optional
+        The plot interval
+
+    """
 
     plt.figure(figsize = figsize)
     num_electrons = len(x_traj_list)

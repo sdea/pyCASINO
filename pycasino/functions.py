@@ -251,7 +251,10 @@ def simulate_bulk_interaction(E_beam, Z, A, rho, radius, center, num_electrons =
     
     Returns
     -------
-    
+     A tuple containing:
+            A list of bools - for each electron simulated, True if backscattered, False otherwise
+            A list of trajectories - each element of the list contains the x-coordinates for the trajectory of a simulated electron  
+            A list of trajectories - each element of the list contains the y-coordinates for the trajectory of a simulated electron
     """
     x_list_final = [] 
     y_list_final = []

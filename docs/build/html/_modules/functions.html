@@ -69,20 +69,22 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">A set of functions needed to compute the electron trajectories</span>
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/Users/sdea/Coding/pyCASINO&#39;</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">constants</span>
+<span class="kn">from</span> <span class="nn">pycasino</span> <span class="kn">import</span> <span class="n">constants</span>
 
 <div class="viewcode-block" id="compute_alpha"><a class="viewcode-back" href="../modules.html#functions.compute_alpha">[docs]</a><span class="k">def</span> <span class="nf">compute_alpha</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">Z</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the screening factor, taking into account the electron cloud surrounding each atom.</span>
+<span class="sd">    This function computes the screening factor, which accounts for the sorrounding electron cloud of the nucleus. The expression used is empirically estimated (Bishop 1976).</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    E : float</span>
 <span class="sd">        The energy of the electron.</span>
 <span class="sd">    Z : int</span>
-<span class="sd">        The atomic number of the element.</span>
+<span class="sd">        The atomic number of the target.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -94,21 +96,21 @@
 
 <div class="viewcode-block" id="compute_sigma"><a class="viewcode-back" href="../modules.html#functions.compute_sigma">[docs]</a><span class="k">def</span> <span class="nf">compute_sigma</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">alpha</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the Rutherford scattering cross-section.</span>
+<span class="sd">    This functions computes the relativistic corrected, screened Rutherford elastic cross-section. E is the energy of the electron in keV, Z is the atomic number of the target and alpha is a screening factor. The screening factor accounts for the fact that the incident electron does not see all the charge of the nucleus because of the sorrounding electron cloud.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    E : float</span>
 <span class="sd">        The energy of the electron.</span>
 <span class="sd">    Z : int</span>
-<span class="sd">        The atomic number of the element.</span>
+<span class="sd">        The atomic number of the target.</span>
 <span class="sd">    alpha : float</span>
 <span class="sd">        The screening factor.</span>
 <span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    float</span>
-<span class="sd">        The Rutherford scattering cross-section in cm^2.</span>
+<span class="sd">        The Rutherford elastic scattering cross-section in cm^2.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">numeric_factor</span> <span class="o">=</span> <span class="mf">5.21E-21</span> <span class="o">*</span> <span class="p">(</span><span class="n">Z</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">E</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
     <span class="n">alpha_factor</span> <span class="o">=</span> <span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">alpha</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">alpha</span><span class="p">))</span>
@@ -119,7 +121,7 @@
 
 <div class="viewcode-block" id="compute_step"><a class="viewcode-back" href="../modules.html#functions.compute_step">[docs]</a><span class="k">def</span> <span class="nf">compute_step</span><span class="p">(</span><span class="n">lambda_mean</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the random path length taken by the electron.</span>
+<span class="sd">    This function computes the random path length traveled by the electron between two scattering events.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -129,14 +131,14 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    float</span>
-<span class="sd">        The random path length.</span>
+<span class="sd">        The random path length expressed in cm.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">random_step</span> <span class="o">=</span> <span class="o">-</span><span class="n">lambda_mean</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">random_step</span></div>
 
 <div class="viewcode-block" id="compute_scatt_angle"><a class="viewcode-back" href="../modules.html#functions.compute_scatt_angle">[docs]</a><span class="k">def</span> <span class="nf">compute_scatt_angle</span><span class="p">(</span><span class="n">alpha</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the cosine of the solid angle.</span>
+<span class="sd">    This function computes the scattering angle related to a scattering event.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -155,28 +157,76 @@
 
 <div class="viewcode-block" id="compute_lambda"><a class="viewcode-back" href="../modules.html#functions.compute_lambda">[docs]</a><span class="k">def</span> <span class="nf">compute_lambda</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Compute the mean free path length.</span>
+<span class="sd">    This function computes the mean free path of the electron in the target material, given the Rutherford cross-section sigma.</span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    A : float</span>
-<span class="sd">        The atomic mass number.</span>
+<span class="sd">        The atomic mass number of the target (g/mol).</span>
 <span class="sd">    rho : float</span>
-<span class="sd">        The density of the material.</span>
+<span class="sd">        The density of the target (g/cm^3).</span>
 <span class="sd">    sigma : float</span>
-<span class="sd">        The scattering cross-section.</span>
+<span class="sd">        The scattering cross-section (cm^2).</span>
 <span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    float</span>
 <span class="sd">        The mean free path length in cm.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">lambda_path</span> <span class="o">=</span> <span class="n">A</span> <span class="o">/</span> <span class="p">(</span><span class="n">rho</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">N_A</span> <span class="o">*</span> <span class="n">sigma</span> <span class="o">*</span> <span class="mf">1E-21</span><span class="p">)</span>
+    <span class="c1"># lambda_path = A / (rho * constants.N_a * sigma * 1E-21)</span>
+    <span class="n">lambda_path</span> <span class="o">=</span> <span class="n">A</span> <span class="o">/</span> <span class="p">(</span><span class="n">rho</span> <span class="o">*</span> <span class="n">constants</span><span class="o">.</span><span class="n">N_a</span> <span class="o">*</span> <span class="n">sigma</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">lambda_path</span></div>
 
-<div class="viewcode-block" id="simulate_trajectory"><a class="viewcode-back" href="../modules.html#functions.simulate_trajectory">[docs]</a><span class="k">def</span> <span class="nf">simulate_trajectory</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">x_ini</span><span class="p">,</span> <span class="n">y_ini</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<div class="viewcode-block" id="compute_J"><a class="viewcode-back" href="../modules.html#functions.compute_J">[docs]</a><span class="k">def</span> <span class="nf">compute_J</span><span class="p">(</span><span class="n">Z</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Simulate the trajectory of an electron through a material.</span>
+<span class="sd">    This function computes the mean ionization potential for a given element with atomic number Z.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+
+<span class="sd">    Z : int </span>
+<span class="sd">        Atomic number of the target material.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    float</span>
+<span class="sd">        The mean ionization potential in keV.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">J</span> <span class="o">=</span> <span class="p">(</span><span class="mf">9.76</span> <span class="o">*</span> <span class="n">Z</span> <span class="o">+</span> <span class="mf">58.5</span> <span class="o">/</span> <span class="n">Z</span><span class="o">**</span><span class="mf">0.19</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1E-03</span>
+    <span class="k">return</span> <span class="n">J</span></div>
+
+<div class="viewcode-block" id="compute_energy_loss"><a class="viewcode-back" href="../modules.html#functions.compute_energy_loss">[docs]</a><span class="k">def</span> <span class="nf">compute_energy_loss</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">step</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function computes the energy loss experienced by the electron as it moves through the target.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    E : float </span>
+<span class="sd">        Energy of the electron in keV.</span>
+<span class="sd">    Z : int</span>
+<span class="sd">        Atomic number of the target material.</span>
+<span class="sd">    A : float </span>
+<span class="sd">        Atomic mass of the target in g/mol.</span>
+<span class="sd">    rho : float </span>
+<span class="sd">        Density of the target in g/cm^3.</span>
+<span class="sd">    step : float </span>
+<span class="sd">        The random step length between scattering events in cm.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns</span>
+<span class="sd">    ------- </span>
+<span class="sd">    float</span>
+<span class="sd">        Energy loss of the particle over the given step size in MeV.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">J</span> <span class="o">=</span> <span class="n">compute_J</span><span class="p">(</span><span class="n">Z</span><span class="p">)</span>
+    <span class="n">dEdS</span> <span class="o">=</span> <span class="o">-</span><span class="mi">78500</span> <span class="o">*</span> <span class="p">((</span><span class="n">rho</span> <span class="o">*</span> <span class="n">Z</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">A</span> <span class="o">*</span> <span class="n">E</span><span class="p">))</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="mf">1.166</span> <span class="o">*</span> <span class="n">E</span><span class="p">)</span> <span class="o">/</span> <span class="n">J</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">E_loss</span> <span class="o">=</span> <span class="n">step</span> <span class="o">*</span> <span class="n">dEdS</span>
+    <span class="k">return</span> <span class="n">E_loss</span></div>
+
+<div class="viewcode-block" id="compute_single_trajectory"><a class="viewcode-back" href="../modules.html#functions.compute_single_trajectory">[docs]</a><span class="k">def</span> <span class="nf">compute_single_trajectory</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">x_ini</span><span class="p">,</span> <span class="n">y_ini</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="mi">1000</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This function computes the trajectory of a single electron inside a uniform, bulk material. </span>
 <span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -199,9 +249,9 @@
 <span class="sd">    -------</span>
 <span class="sd">    tuple</span>
 <span class="sd">        A tuple containing:</span>
-<span class="sd">        - x_list (list of float): List of x-coordinates of the electron trajectory.</span>
-<span class="sd">        - y_list (list of float): List of y-coordinates of the electron trajectory.</span>
-<span class="sd">        - is_backscattered (bool): True if the electron is backscattered, False otherwise.</span>
+<span class="sd">            - x_list (list of float): List of x-coordinates of the single electron trajectory.</span>
+<span class="sd">            - y_list (list of float): List of y-coordinates of the single electron trajectory.</span>
+<span class="sd">            - is_backscattered (bool): True if the electron is backscattered, False otherwise.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">x_list</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">y_list</span> <span class="o">=</span> <span class="p">[]</span>
@@ -232,38 +282,68 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">is_backscattered</span> <span class="o">=</span> <span class="kc">False</span>
         
+        <span class="n">E_loss</span> <span class="o">=</span> <span class="n">compute_energy_loss</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">E_loss</span><span class="p">)</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">E</span> <span class="o">+</span> <span class="n">E_loss</span>
+        
         <span class="k">if</span> <span class="n">E</span> <span class="o">&lt;</span> <span class="mf">0.2</span><span class="p">:</span>
             <span class="k">break</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">x_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
             <span class="n">y_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+        
     
     <span class="k">return</span> <span class="n">x_list</span><span class="p">,</span> <span class="n">y_list</span><span class="p">,</span> <span class="n">is_backscattered</span></div>
 
-<div class="viewcode-block" id="get_element_properties"><a class="viewcode-back" href="../modules.html#functions.get_element_properties">[docs]</a><span class="k">def</span> <span class="nf">get_element_properties</span><span class="p">(</span><span class="n">symbol</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the properties of an element by its symbol.</span>
+<div class="viewcode-block" id="simulate_bulk_interaction"><a class="viewcode-back" href="../modules.html#functions.simulate_bulk_interaction">[docs]</a><span class="k">def</span> <span class="nf">simulate_bulk_interaction</span><span class="p">(</span><span class="n">E_beam</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">num_electrons</span> <span class="o">=</span> <span class="mi">5000</span><span class="p">):</span>
 
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Simulate the trajectory of an electron through a material.</span>
+<span class="sd">    </span>
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    symbol : str</span>
-<span class="sd">        The symbol of the element.</span>
-
+<span class="sd">    E : float</span>
+<span class="sd">        The initial energy of the electron.</span>
+<span class="sd">    Z : int</span>
+<span class="sd">        The atomic number of the element.</span>
+<span class="sd">    A : float</span>
+<span class="sd">        The atomic mass number.</span>
+<span class="sd">    rho : float</span>
+<span class="sd">        The density of the material.</span>
+<span class="sd">    radius : float</span>
+<span class="sd">        The radius of the electron beam</span>
+<span class="sd">    center : float</span>
+<span class="sd">        The y-coordinate for the center of the electron beam</span>
+<span class="sd">    num_electrons : int, optional</span>
+<span class="sd">        The number of electrons to simulate (default is 5000).</span>
+<span class="sd">    </span>
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    dict</span>
-<span class="sd">        A dictionary containing the atomic number, atomic mass, and density of the element.</span>
+<span class="sd">    </span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">elements</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">element</span><span class="p">[</span><span class="s2">&quot;symbol&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">symbol</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">{</span>
-                <span class="s2">&quot;atomic_number&quot;</span><span class="p">:</span> <span class="n">element</span><span class="p">[</span><span class="s2">&quot;atomic_number&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;atomic_mass&quot;</span><span class="p">:</span> <span class="n">element</span><span class="p">[</span><span class="s2">&quot;atomic_mass&quot;</span><span class="p">],</span>
-                <span class="s2">&quot;density&quot;</span><span class="p">:</span> <span class="n">element</span><span class="p">[</span><span class="s2">&quot;density&quot;</span><span class="p">],</span>
-            <span class="p">}</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Element </span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s1"> not found! Returning None...&#39;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="n">x_list_final</span> <span class="o">=</span> <span class="p">[]</span> 
+    <span class="n">y_list_final</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">bse_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n_el</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">num_electrons</span><span class="p">):</span>
+    
+        <span class="c1"># Reset parameters  </span>
+        <span class="n">x</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">E</span> <span class="o">=</span> <span class="n">E_beam</span>
+
+        <span class="c1"># For the radius we need a gauss distribution</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">center</span>
+        <span class="n">x_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">y_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">is_backscattered</span> <span class="o">=</span> <span class="kc">False</span>
+        
+        <span class="n">x_list</span><span class="p">,</span> <span class="n">y_list</span><span class="p">,</span> <span class="n">is_backscattered</span> <span class="o">=</span> <span class="n">compute_single_trajectory</span><span class="p">(</span><span class="n">E</span><span class="p">,</span> <span class="n">Z</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> 
+            
+        <span class="n">bse_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">is_backscattered</span><span class="p">)</span>
+        <span class="n">x_list_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_list</span><span class="p">)</span>
+        <span class="n">y_list_final</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">y_list</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">bse_list</span><span class="p">,</span> <span class="n">x_list_final</span><span class="p">,</span> <span class="n">y_list_final</span></div>
 </pre></div>
 
            </div>

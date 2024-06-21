@@ -73,14 +73,28 @@
 </div>
 <span class="target" id="module-functions"></span><p>A set of functions needed to compute the electron trajectories</p>
 <dl class="py function">
+<dt class="sig sig-object py" id="functions.compute_J">
+<span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">compute_J</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#compute_J"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.compute_J" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function computes the mean ionization potential for a given element with atomic number Z.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>Z</strong> (<em>int</em>) – Atomic number of the target material.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>float</em> – The mean ionization potential in keV.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="functions.compute_alpha">
 <span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">compute_alpha</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#compute_alpha"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.compute_alpha" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the screening factor, taking into account the electron cloud surrounding each atom.</p>
+<dd><p>This function computes the screening factor, which accounts for the sorrounding electron cloud of the nucleus. The expression used is empirically estimated (Bishop 1976).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>E</strong> (<em>float</em>) – The energy of the electron.</p></li>
-<li><p><strong>Z</strong> (<em>int</em>) – The atomic number of the element.</p></li>
+<li><p><strong>Z</strong> (<em>int</em>) – The atomic number of the target.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -90,15 +104,35 @@
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="functions.compute_lambda">
-<span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">compute_lambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#compute_lambda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.compute_lambda" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the mean free path length.</p>
+<dt class="sig sig-object py" id="functions.compute_energy_loss">
+<span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">compute_energy_loss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#compute_energy_loss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.compute_energy_loss" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function computes the energy loss experienced by the electron as it moves through the target.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>A</strong> (<em>float</em>) – The atomic mass number.</p></li>
-<li><p><strong>rho</strong> (<em>float</em>) – The density of the material.</p></li>
-<li><p><strong>sigma</strong> (<em>float</em>) – The scattering cross-section.</p></li>
+<li><p><strong>E</strong> (<em>float</em>) – Energy of the electron in keV.</p></li>
+<li><p><strong>Z</strong> (<em>int</em>) – Atomic number of the target material.</p></li>
+<li><p><strong>A</strong> (<em>float</em>) – Atomic mass of the target in g/mol.</p></li>
+<li><p><strong>rho</strong> (<em>float</em>) – Density of the target in g/cm^3.</p></li>
+<li><p><strong>step</strong> (<em>float</em>) – The random step length between scattering events in cm.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>float</em> – Energy loss of the particle over the given step size in MeV.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions.compute_lambda">
+<span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">compute_lambda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#compute_lambda"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.compute_lambda" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function computes the mean free path of the electron in the target material, given the Rutherford cross-section sigma.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>A</strong> (<em>float</em>) – The atomic mass number of the target (g/mol).</p></li>
+<li><p><strong>rho</strong> (<em>float</em>) – The density of the target (g/cm^3).</p></li>
+<li><p><strong>sigma</strong> (<em>float</em>) – The scattering cross-section (cm^2).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -110,7 +144,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="functions.compute_scatt_angle">
 <span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">compute_scatt_angle</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#compute_scatt_angle"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.compute_scatt_angle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the cosine of the solid angle.</p>
+<dd><p>This function computes the scattering angle related to a scattering event.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>alpha</strong> (<em>float</em>) – The screening factor.</p>
@@ -124,53 +158,25 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="functions.compute_sigma">
 <span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">compute_sigma</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#compute_sigma"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.compute_sigma" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the Rutherford scattering cross-section.</p>
+<dd><p>This functions computes the relativistic corrected, screened Rutherford elastic cross-section. E is the energy of the electron in keV, Z is the atomic number of the target and alpha is a screening factor. The screening factor accounts for the fact that the incident electron does not see all the charge of the nucleus because of the sorrounding electron cloud.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>E</strong> (<em>float</em>) – The energy of the electron.</p></li>
-<li><p><strong>Z</strong> (<em>int</em>) – The atomic number of the element.</p></li>
+<li><p><strong>Z</strong> (<em>int</em>) – The atomic number of the target.</p></li>
 <li><p><strong>alpha</strong> (<em>float</em>) – The screening factor.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>float</em> – The Rutherford scattering cross-section in cm^2.</p>
+<dd class="field-even"><p><em>float</em> – The Rutherford elastic scattering cross-section in cm^2.</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="functions.compute_step">
-<span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">compute_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambda_mean</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#compute_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.compute_step" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute the random path length taken by the electron.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>lambda_mean</strong> (<em>float</em>) – The mean free path length.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>float</em> – The random path length.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="functions.get_element_properties">
-<span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">get_element_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">symbol</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#get_element_properties"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.get_element_properties" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the properties of an element by its symbol.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>symbol</strong> (<em>str</em>) – The symbol of the element.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>dict</em> – A dictionary containing the atomic number, atomic mass, and density of the element.</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="functions.simulate_trajectory">
-<span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">simulate_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_ini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_ini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#simulate_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.simulate_trajectory" title="Permalink to this definition">¶</a></dt>
-<dd><p>Simulate the trajectory of an electron through a material.</p>
+<dt class="sig sig-object py" id="functions.compute_single_trajectory">
+<span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">compute_single_trajectory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_ini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_ini</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#compute_single_trajectory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.compute_single_trajectory" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function computes the trajectory of a single electron inside a uniform, bulk material.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -184,10 +190,49 @@
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><em>tuple</em> – A tuple containing:
-- x_list (list of float): List of x-coordinates of the electron trajectory.
-- y_list (list of float): List of y-coordinates of the electron trajectory.
-- is_backscattered (bool): True if the electron is backscattered, False otherwise.</p>
+<dd class="field-even"><p><p><em>tuple</em> –</p>
+<dl class="simple">
+<dt>A tuple containing:</dt><dd><ul class="simple">
+<li><p>x_list (list of float): List of x-coordinates of the single electron trajectory.</p></li>
+<li><p>y_list (list of float): List of y-coordinates of the single electron trajectory.</p></li>
+<li><p>is_backscattered (bool): True if the electron is backscattered, False otherwise.</p></li>
+</ul>
+</dd>
+</dl>
+</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions.compute_step">
+<span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">compute_step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lambda_mean</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#compute_step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.compute_step" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function computes the random path length traveled by the electron between two scattering events.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lambda_mean</strong> (<em>float</em>) – The mean free path length.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><em>float</em> – The random path length expressed in cm.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="functions.simulate_bulk_interaction">
+<span class="sig-prename descclassname"><span class="pre">functions.</span></span><span class="sig-name descname"><span class="pre">simulate_bulk_interaction</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">E_beam</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">A</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rho</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">radius</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_electrons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/functions.html#simulate_bulk_interaction"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#functions.simulate_bulk_interaction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simulate the trajectory of an electron through a material.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>E</strong> (<em>float</em>) – The initial energy of the electron.</p></li>
+<li><p><strong>Z</strong> (<em>int</em>) – The atomic number of the element.</p></li>
+<li><p><strong>A</strong> (<em>float</em>) – The atomic mass number.</p></li>
+<li><p><strong>rho</strong> (<em>float</em>) – The density of the material.</p></li>
+<li><p><strong>radius</strong> (<em>float</em>) – The radius of the electron beam</p></li>
+<li><p><strong>center</strong> (<em>float</em>) – The y-coordinate for the center of the electron beam</p></li>
+<li><p><strong>num_electrons</strong> (<em>int, optional</em>) – The number of electrons to simulate (default is 5000).</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
