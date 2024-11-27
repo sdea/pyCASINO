@@ -148,7 +148,7 @@ def compute_energy_loss(E, Z, A, rho, step):
     Returns
     ------- 
     float
-        Energy loss of the particle over the given step size in MeV.
+        Energy loss of the electron over the given step size. The energy loss is measured in MeV.
     """
 
     J = compute_J(Z)
@@ -191,6 +191,7 @@ def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
     x = x_ini
     y = y_ini
 
+    # This is temporary, to include tilt in a future version
     theta = 0
 
     for i in range(max_steps):
