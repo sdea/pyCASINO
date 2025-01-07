@@ -1,11 +1,10 @@
 """
 A set of functions needed to compute the electron trajectories
 """
-import sys
-sys.path.append('/Users/sdea/Coding/pyCASINO')
 
 import numpy as np
-from pycasino import constants
+from tqdm import tqdm
+import constants, utils
 
 def compute_alpha(E, Z):
     """
@@ -184,10 +183,12 @@ def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
             - x_list (list of float): List of x-coordinates of the single electron trajectory.
             - y_list (list of float): List of y-coordinates of the single electron trajectory.
             - is_backscattered (bool): True if the electron is backscattered, False otherwise.
+            - is_trasmitted (bool): True if the electron is backscattered, False otherwise.
     """
     x_list = []
     y_list = []
     is_backscattered = False
+    is_trasmitted = False
     x = x_ini
     y = y_ini
 
@@ -279,3 +280,104 @@ def simulate_bulk_interaction(E_beam, Z, A, rho, radius, center, num_electrons =
         y_list_final.append(y_list)
     
     return bse_list, x_list_final, y_list_final
+
+def get_bulk_results(sim_param):
+    """
+    A function to compute all electron trajectories in the material.
+    
+    Parameters
+    ----------
+    sim_param : SimulationParameters
+        The SimulationParameters class storing the parameters for the simulation
+    
+    Returns
+    -------
+     A simulation result struct *to write it better*        
+    """
+    x_list_final = [] 
+    y_list_final = []
+    bse_list = []
+    
+    for n_el in tqdm(range(0, sim_param.N_electrons), desc = 'N Electrons'):
+    
+        # Reset parameters  
+        x = 0 
+        E = sim_param.E_beam
+
+        # For the radius we need a gaussian distribution
+        # y = sim_param.y_ini
+        y = utils.generate_electron_position(sim_param.y_ini, sim_param.radius)
+        x_list = []
+        y_list = []
+        is_backscattered = False
+        
+        x_list, y_list, is_backscattered = compute_single_trajectory(E, sim_param.Z, sim_param.A, sim_param.rho, x, y) 
+            
+        bse_list.append(is_backscattered)
+        x_list_final.append(x_list)
+        y_list_final.append(y_list)
+
+
+    # Instantiate the simulation results class 
+    utils.SimulationResults._can_instantiate = True
+    sim_results = utils.SimulationResults(bse_list, x_list_final, y_list_final)
+
+    return sim_results
+
+
+
+def get_bulk_results2(E_beam, Z, A, rho, radius, center, num_electrons = 5000):
+
+    """
+    Simulate the trajectory of an electron through a material.
+    
+    Parameters
+    ----------
+    E : float
+        The initial energy of the electron.
+    Z : int
+        The atomic number of the element.
+    A : float
+        The atomic mass number.
+    rho : float
+        The density of the material.
+    radius : float
+        The radius of the electron beam
+    center : float
+        The y-coordinate for the center of the electron beam
+    num_electrons : int, optional
+        The number of electrons to simulate (default is 5000).
+    
+    Returns
+    -------
+     A simulation result struct *to write it better*
+            
+    """
+    x_list_final = [] 
+    y_list_final = []
+    bse_list = []
+    
+    for n_el in range(0, num_electrons):
+    
+        # Reset parameters  
+        x = 0
+        E = E_beam
+
+        # For the radius we need a gaussian distribution
+        y = center
+        x_list = []
+        y_list = []
+        is_backscattered = False
+        
+        x_list, y_list, is_backscattered = compute_single_trajectory(E, Z, A, rho, x, y) 
+            
+        bse_list.append(is_backscattered)
+        x_list_final.append(x_list)
+        y_list_final.append(y_list)
+
+
+    # Instantiate the simulation results class 
+    utils.SimulationResults._can_instantiate = True
+    sim_results = utils.SimulationResults(bse_list, x_list_final, y_list_final)
+
+    return sim_results
