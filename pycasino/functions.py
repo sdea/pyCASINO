@@ -155,7 +155,93 @@ def compute_energy_loss(E, Z, A, rho, step):
     E_loss = step * dEdS
     return E_loss
 
-def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
+def compute_single_trajectory_thin(E, Z, A, rho, x_ini, y_ini, theta_ini, thickness, max_steps=1000):
+    """
+    This function computes the trajectory of a single electron across a thin-film sample. These types of sample are used in TEM analysis 
+    
+    Parameters
+    ----------
+    E : float
+        The initial energy of the electron.
+    Z : int
+        The atomic number of the element.
+    A : float
+        The atomic mass number.
+    rho : float
+        The density of the material.
+    x_ini : float
+        The initial x-coordinate of the electron.
+    y_ini : float
+        The initial y-coordinate of the electron.
+    max_steps : int, optional
+        The maximum number of steps to simulate (default is 1000).
+    
+    Returns
+    -------
+    tuple
+        A tuple containing:
+            - x_list (list of float): List of x-coordinates of the single electron trajectory.
+            - y_list (list of float): List of y-coordinates of the single electron trajectory.
+            - is_backscattered (bool): True if the electron is backscattered, False otherwise.
+            - is_trasmitted (bool): True if the electron is backscattered, False otherwise.
+    """
+    x_list = []
+    y_list = []
+    theta_list = []
+    E_list =  []
+    is_backscattered = False
+    is_trasmitted = False
+    x = x_ini
+    y = y_ini
+
+    theta = np.deg2rad(theta_ini)
+
+    for i in range(max_steps):
+        
+        alpha = compute_alpha(E, Z)
+        sigma = compute_sigma(E, Z, alpha)
+        lambda_mean = compute_lambda(A, rho, sigma)
+        step = compute_step(lambda_mean)
+        theta_new = compute_scatt_angle(alpha)
+
+        rand_sign = 2 * np.random.randint(0, 2) - 1
+        theta_new = theta_new * rand_sign
+
+        theta = theta + theta_new
+
+        x = x + step * np.cos(theta)
+        y = y + step * np.sin(theta)
+        
+        # Check if the electron is backscattered
+        if x <= 0:
+            is_backscattered = True
+            break
+        else:
+            if thickness >= 0:
+                thickness_cm = thickness * 1E-07
+                if x >= thickness_cm:
+                    is_trasmitted = True
+                    break
+                else:
+                    is_trasmitted = False
+            
+        E_loss = compute_energy_loss(E, Z, A, rho, step)
+        E = E + E_loss
+        
+        if E < 0.2:
+            break
+        else:
+            x_list.append(x)
+            y_list.append(y)
+            theta_list.append(theta)
+            E_list.append(E)
+
+    utils.ElectronTrajectory._can_instantiate = True
+    trajectory = utils.ElectronTrajectory(x_list, y_list, theta_list, E_list, is_backscattered, is_trasmitted)    
+    
+    return trajectory
+
+def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, theta_ini, max_steps=1000):
     """
     This function computes the trajectory of a single electron inside a uniform, bulk material. 
     
@@ -187,15 +273,17 @@ def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
     """
     x_list = []
     y_list = []
+    theta_list = []
+    E_list =  []
     is_backscattered = False
     is_trasmitted = False
     x = x_ini
     y = y_ini
 
-    # This is temporary, to include tilt in a future version
-    theta = 0
+    theta = np.deg2rad(theta_ini)
 
     for i in range(max_steps):
+        
         alpha = compute_alpha(E, Z)
         sigma = compute_sigma(E, Z, alpha)
         lambda_mean = compute_lambda(A, rho, sigma)
@@ -210,6 +298,7 @@ def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
         x = x + step * np.cos(theta)
         y = y + step * np.sin(theta)
         
+        # Check if the electron is backscattered
         if x <= 0:
             is_backscattered = True
             break
@@ -224,15 +313,17 @@ def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, max_steps=1000):
         else:
             x_list.append(x)
             y_list.append(y)
+            theta_list.append(theta)
+            E_list.append(E)
 
-        
+    utils.ElectronTrajectory._can_instantiate = True
+    trajectory = utils.ElectronTrajectory(x_list, y_list, theta_list, E_list, is_backscattered, is_trasmitted)    
     
-    return x_list, y_list, is_backscattered
+    return trajectory
 
-def simulate_bulk_interaction(E_beam, Z, A, rho, radius, center, num_electrons = 5000):
-
+def compute_single_trajectory_interface(E, Z, A, rho, x_ini, y_ini, theta_ini, max_steps=1000):
     """
-    Simulate the trajectory of an electron through a material.
+    This function computes the trajectory of a single electron inside a uniform, bulk material. 
     
     Parameters
     ----------
@@ -244,42 +335,82 @@ def simulate_bulk_interaction(E_beam, Z, A, rho, radius, center, num_electrons =
         The atomic mass number.
     rho : float
         The density of the material.
-    radius : float
-        The radius of the electron beam
-    center : float
-        The y-coordinate for the center of the electron beam
-    num_electrons : int, optional
-        The number of electrons to simulate (default is 5000).
+    x_ini : float
+        The initial x-coordinate of the electron.
+    y_ini : float
+        The initial y-coordinate of the electron.
+    max_steps : int, optional
+        The maximum number of steps to simulate (default is 1000).
     
     Returns
     -------
-     A tuple containing:
-            A list of bools - for each electron simulated, True if backscattered, False otherwise
-            A list of trajectories - each element of the list contains the x-coordinates for the trajectory of a simulated electron  
-            A list of trajectories - each element of the list contains the y-coordinates for the trajectory of a simulated electron
+    tuple
+        A tuple containing:
+            - x_list (list of float): List of x-coordinates of the single electron trajectory.
+            - y_list (list of float): List of y-coordinates of the single electron trajectory.
+            - is_backscattered (bool): True if the electron is backscattered, False otherwise.
+            - is_trasmitted (bool): True if the electron is backscattered, False otherwise.
     """
-    x_list_final = [] 
-    y_list_final = []
-    bse_list = []
-    for n_el in range(0, num_electrons):
     
-        # Reset parameters  
-        x = 0
-        E = E_beam
+    # E, Z, A, rho are in this case a list of two elements
+    x_list = []
+    y_list = []
+    theta_list = []
+    E_list =  []
+    is_backscattered = False
+    is_trasmitted = False
+    x = x_ini
+    y = y_ini
 
-        # For the radius we need a gauss distribution
-        y = center
-        x_list = []
-        y_list = []
-        is_backscattered = False
+    theta = np.deg2rad(theta_ini)
+
+    for i in range(max_steps):
         
-        x_list, y_list, is_backscattered = compute_single_trajectory(E, Z, A, rho, x, y) 
-            
-        bse_list.append(is_backscattered)
-        x_list_final.append(x_list)
-        y_list_final.append(y_list)
+        if y <= 0:
+            alpha = compute_alpha(E, Z[0])
+            sigma = compute_sigma(E, Z[0], alpha)
+            lambda_mean = compute_lambda(A[0], rho[0], sigma)
+        else:
+            alpha = compute_alpha(E, Z[1])
+            sigma = compute_sigma(E, Z[1], alpha)
+            lambda_mean = compute_lambda(A[1], rho[1], sigma)
+        
+        step = compute_step(lambda_mean)
+        theta_new = compute_scatt_angle(alpha)
+        rand_sign = 2 * np.random.randint(0, 2) - 1
+        theta_new = theta_new * rand_sign
+
+        theta = theta + theta_new
+
+        x = x + step * np.cos(theta)
+        y = y + step * np.sin(theta)
+        
+        # Check if the electron is backscattered
+        if x <= 0:
+            is_backscattered = True
+            break
+        else:
+            is_backscattered = False
+        
+        if y<=0:
+            E_loss = compute_energy_loss(E, Z[0], A[0], rho[0], step)
+        else:
+            E_loss = compute_energy_loss(E, Z[1], A[1], rho[1], step)
+        
+        E = E + E_loss
+        
+        if E < 0.2:
+            break
+        else:
+            x_list.append(x)
+            y_list.append(y)
+            theta_list.append(theta)
+            E_list.append(E)
+
+    utils.ElectronTrajectory._can_instantiate = True
+    trajectory = utils.ElectronTrajectory(x_list, y_list, theta_list, E_list, is_backscattered, is_trasmitted)    
     
-    return bse_list, x_list_final, y_list_final
+    return trajectory
 
 def get_bulk_results(sim_param):
     """
@@ -294,9 +425,7 @@ def get_bulk_results(sim_param):
     -------
      A simulation result struct *to write it better*        
     """
-    x_list_final = [] 
-    y_list_final = []
-    bse_list = []
+    traj_list = []
     
     for n_el in tqdm(range(0, sim_param.N_electrons), desc = 'N Electrons'):
     
@@ -305,79 +434,24 @@ def get_bulk_results(sim_param):
         E = sim_param.E_beam
 
         # For the radius we need a gaussian distribution
-        # y = sim_param.y_ini
         y = utils.generate_electron_position(sim_param.y_ini, sim_param.radius)
+        
         x_list = []
         y_list = []
         is_backscattered = False
         
-        x_list, y_list, is_backscattered = compute_single_trajectory(E, sim_param.Z, sim_param.A, sim_param.rho, x, y) 
-            
-        bse_list.append(is_backscattered)
-        x_list_final.append(x_list)
-        y_list_final.append(y_list)
-
-
-    # Instantiate the simulation results class 
-    utils.SimulationResults._can_instantiate = True
-    sim_results = utils.SimulationResults(bse_list, x_list_final, y_list_final)
-
-    return sim_results
-
-
-
-def get_bulk_results2(E_beam, Z, A, rho, radius, center, num_electrons = 5000):
-
-    """
-    Simulate the trajectory of an electron through a material.
-    
-    Parameters
-    ----------
-    E : float
-        The initial energy of the electron.
-    Z : int
-        The atomic number of the element.
-    A : float
-        The atomic mass number.
-    rho : float
-        The density of the material.
-    radius : float
-        The radius of the electron beam
-    center : float
-        The y-coordinate for the center of the electron beam
-    num_electrons : int, optional
-        The number of electrons to simulate (default is 5000).
-    
-    Returns
-    -------
-     A simulation result struct *to write it better*
-            
-    """
-    x_list_final = [] 
-    y_list_final = []
-    bse_list = []
-    
-    for n_el in range(0, num_electrons):
-    
-        # Reset parameters  
-        x = 0
-        E = E_beam
-
-        # For the radius we need a gaussian distribution
-        y = center
-        x_list = []
-        y_list = []
-        is_backscattered = False
+        if sim_param.simulation_type == 'bulk':
+            trajectory = compute_single_trajectory(E, sim_param.Z, sim_param.A, sim_param.rho, x, y, sim_param.theta)
+        elif sim_param.simulation_type == 'interface':
+            trajectory = compute_single_trajectory_interface(E, sim_param.Z, sim_param.A, sim_param.rho, x, y, sim_param.theta) 
+        elif sim_param.simulation_type == 'thin-film':
+            trajectory = compute_single_trajectory_thin(E, sim_param.Z, sim_param.A, sim_param.rho, x, y, sim_param.theta, sim_param.thickness)         
         
-        x_list, y_list, is_backscattered = compute_single_trajectory(E, Z, A, rho, x, y) 
-            
-        bse_list.append(is_backscattered)
-        x_list_final.append(x_list)
-        y_list_final.append(y_list)
+        traj_list.append(trajectory)
 
 
     # Instantiate the simulation results class 
     utils.SimulationResults._can_instantiate = True
-    sim_results = utils.SimulationResults(bse_list, x_list_final, y_list_final)
+    sim_results = utils.SimulationResults(traj_list)
 
     return sim_results
