@@ -30,7 +30,7 @@ class ElectronTrajectory:
 def generate_electron_position(center, radius=30, std_dev=15):
     """
     A function to generate the initial y position of an electron within an electron beam, just before interacting with the sample.
-    We assume that the beam has an intensity profile that follows a gaussian distribution. 
+    This function assumes that the beam has an intensity profile following a gaussian distribution. 
 
     Parameters:
         center (float): The initial central position for the Gaussian distribution.
@@ -165,7 +165,7 @@ def get_element_properties(symbol):
 def plot_simulation_results(sim_results, plot_interval=10, figsize=(10, 10),
                              beam_color='b', bse_color='r', te_color='g', grid=True):
     """
-    A convenience function to plot the results of a simulation
+    A convenience function to plot the results of a simulation.
 
     Parameters
     ----------
@@ -202,16 +202,14 @@ def plot_simulation_results(sim_results, plot_interval=10, figsize=(10, 10),
             color = beam_color
         
         linewidth = 2.0 if sim_results.traj_list[n_el].is_BSE else 1.5
-        #color = bse_color if sim_results.traj_list[n_el].is_BSE else beam_color
-        #linewidth = 2.0 if sim_results.traj_list[n_el].is_BSE else 1.5
 
         plt.plot(y_coords, x_coords, color=color, linewidth=linewidth)
 
     if grid:
         plt.grid(True)
 
-    plt.xlabel('Y-axis', fontsize=18)
-    plt.ylabel('X-axis', fontsize=18)
+    plt.xlabel('Y-axis [nm]', fontsize=18)
+    plt.ylabel('X-axis [nm]', fontsize=18)
     plt.xticks(fontsize=16)
     plt.yticks(fontsize=16)
     plt.title('Electron Trajectories')

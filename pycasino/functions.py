@@ -157,7 +157,7 @@ def compute_energy_loss(E, Z, A, rho, step):
 
 def compute_single_trajectory_thin(E, Z, A, rho, x_ini, y_ini, theta_ini, thickness, max_steps=1000):
     """
-    This function computes the trajectory of a single electron across a thin-film sample. These types of sample are used in TEM analysis 
+    This function computes the trajectory of a single electron across a thin-film sample. These types of sample are used in TEM analysis. 
     
     Parameters
     ----------
@@ -243,7 +243,8 @@ def compute_single_trajectory_thin(E, Z, A, rho, x_ini, y_ini, theta_ini, thickn
 
 def compute_single_trajectory(E, Z, A, rho, x_ini, y_ini, theta_ini, max_steps=1000):
     """
-    This function computes the trajectory of a single electron inside a uniform, bulk material. 
+    This function computes the trajectory of a single electron inside a uniform, bulk material. Uniform materials can be made of a single element (e.g Ni metal), 
+    solid solutions like alloys (e.g brass) or multi-element materials like oxides, phosphates, polymers etc.    
     
     Parameters
     ----------
